@@ -1,14 +1,25 @@
-
-
+from PIL import Image
+import pytesseract
 import cv2 
 import numpy as np 
 from matplotlib import pyplot as plt 
 import imutils
+import os
 
 template_1_path = './Template/vysttech-symbols/1.png'
 template_a_path = './Template/vysttech-symbols/A.png'
 template_b_path = './Template/vysttech-symbols/B.png'
 imgPath = './drawings/drawing1.png'
+
+def ocr(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    filename = "{}.png".format(os.getpid())
+    cv2.imwrite(filename, gray)
+
+    # apply OCR
+    text = pytesseract.image_to_string(Image.open(filename))
+    os.remove(filename)
+    return text 
 
 # Template Matching for symbols
 def templateMatching(img, template):
@@ -26,6 +37,7 @@ img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 template_1 = cv2.imread(template_1_path, 0)
 found = None
 top_left_1, bottom_right_1, h = templateMatching(img, template_1)
+w, h = template_1.shape[::-1]
 
 threshold = 0.9
 x = top_left_1[0]
@@ -44,6 +56,8 @@ template_a = cv2.imread(template_a_path, 0)
 
 top_left_a, bottom_right_a, h_a = templateMatching(roi, template_a)
 cv2.rectangle(roi, top_left_a, bottom_right_a, (0, 255, 0), 2)
+x_a = top_left_a[0]
+y_a = top_left_a[1]
 
 # Template Matching for surface B
 template_b = cv2.imread(template_b_path, 0)
@@ -51,6 +65,10 @@ template_b = cv2.imread(template_b_path, 0)
 top_left_b, bottom_right_b, h_b = templateMatching(roi, template_b)
 cv2.rectangle(roi, top_left_b, bottom_right_b, (0, 0, 255), 2)
 
+text_roi = img[y:y+h , x + w:x + x_a]
+text = ocr(text_roi)
 
+
+print(text)
 cv2.imshow("res", img)
 cv2.waitKey(0)
