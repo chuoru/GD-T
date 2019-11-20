@@ -44,7 +44,7 @@ x = top_left_1[0]
 y = top_left_1[1]
 i = 1
 while (x + i) < 2500:
-    print(img_gray[y, x+i])
+    #print(img_gray[y, x+i])
     if img_gray[y, x+i] == 255: 
         break 
     i+=1
@@ -68,7 +68,7 @@ cv2.rectangle(roi, top_left_b, bottom_right_b, (0, 0, 255), 2)
 text_roi = img[y:y+h , x + w:x + x_a]
 text = ocr(text_roi)
 
-
+print("Diameter: ")
 print(text)
 cv2.imshow("res", img)
 cv2.waitKey(0)
